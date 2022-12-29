@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.dong4j</groupId>
+    <artifactId>coco-company-dependencies</artifactId>
+    <version>${revision}</version>
+    <relativePath>../coco-company-dependencies/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>coco-company-build</artifactId>
+  <packaging>pom</packaging>
+  <name>Coco Company Build</name>
+
+  <modules>
+    <module>../coco-company-parent</module>
+    <module>../coco-starter-parent</module>
+  </modules>
+
+  <properties>
+    <global.version>2023.1.1-SNAPSHOT</global.version>
+    <coco-plugin.version>${global.version}</coco-plugin.version>
+    <coco-starter-processor.version>${global.version}</coco-starter-processor.version>
+    <!-- 业务端可覆写此配置 -->
+    <coco-company-dependencies.version>${global.version}</coco-company-dependencies.version>
+    <coco-element-dependencies.version>${global.version}</coco-element-dependencies.version>
+    <coco-boot-dependencies.version>${global.version}</coco-boot-dependencies.version>
+    <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+    <!--endregion-->
+  </properties>
+
+  <dependencies>
+    <!-- lombok 插件, 简化代码 (在 package 阶段排除) -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+    </dependency>
+    <!-- idea 提供的用于编译时检查 null 的工具包 (在 package 阶段排除) -->
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+    </dependency>
+    <!-- 生成元数据依赖, 用于生成 spring.factories, 打包配置文件, 处理指定的 annotation. (在 package 阶段排除) -->
+    <dependency>
+      <groupId>net.dreamlu</groupId>
+      <artifactId>mica-auto</artifactId>
+      <version>3.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- mapstruct 注解处理器 (在 package 阶段排除) -->
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct-processor</artifactId>
+      <version>1.5.3.Final</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- 公共插件 -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.github.dong4j</groupId>
+        <artifactId>coco-assist-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+
+    <!-- 插件依赖定义及配置 -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <inherited>true</inherited>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+            <parameters>true</parameters>
+            <encoding>${project.encoding}</encoding>
+            <showDeprecation>true</showDeprecation>
+            <showWarnings>true</showWarnings>
+            <!-- http://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html -->
+            <compilerArgs>
+              <arg>-Xlint:all,-classfile,-rawtypes,-unchecked,-deprecation,-processing</arg>
+            </compilerArgs>
+          </configuration>
+        </plugin>
+
+        <!-- 打包源码插件 -->
+        <plugin>
+          <!-- http://maven.apache.org/plugins/maven-source-plugin/index.html -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <!-- 绑定 source 插件到 Maven 的生命周期, 并在生命周期后执行绑定的 source 的 goal -->
+          <executions>
+            <execution>
+              <!-- 绑定 source 插件到 Maven 的生命周期 -->
+              <phase>verify</phase>
+              <!-- 在生命周期后执行绑定的 source 插件的 goals -->
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <!-- IDEA 直接查看源码 -->
+            <attach>true</attach>
+            <!-- 包含资源文件 -->
+            <excludeResources>true</excludeResources>
+            <!-- 包含 pom -->
+            <includePom>true</includePom>
+            <!-- 时间戳 -->
+            <!--suppress UnresolvedMavenProperty -->
+            <outputTimestamp>${current.time}</outputTimestamp>
+            <finalName>${project.artifactId}-${project.version}</finalName>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>io.github.dong4j</groupId>
+          <artifactId>coco-assist-maven-plugin</artifactId>
+          <version>${coco-plugin.version}</version>
+          <executions>
+            <!-- 为 pom 模块移除不需要的插件 -->
+            <execution>
+              <id>skip-plugin</id>
+              <goals>
+                <goal>skip-plugin</goal>
+              </goals>
+            </execution>
+            <!-- 时间戳处理 -->
+            <execution>
+              <id>timestamp-property</id>
+              <goals>
+                <goal>timestamp-property</goal>
+              </goals>
+              <configuration>
+                <name>current.time</name>
+                <pattern>MMddHHmm</pattern>
+                <timeZone>GMT+8</timeZone>
+                <locale>zh,CN</locale>
+              </configuration>
+            </execution>
+            <!-- 部署模块配置处理 -->
+            <execution>
+              <id>mainclass-property</id>
+              <goals>
+                <goal>mainclass-property</goal>
+              </goals>
+              <configuration>
+                <name>start.class</name>
+              </configuration>
+            </execution>
+            <execution>
+              <goals>
+                <goal>generate-build-info</goal>
+              </goals>
+              <configuration>
+                <additionalProperties>
+                  <encoding.source>${project.encoding}</encoding.source>
+                  <encoding.reporting>${project.encoding}</encoding.reporting>
+                  <project.name>${project.build.finalName}</project.name>
+                  <user.name>${user.name}</user.name>
+                  <compiler.source.jdk>${java.version}</compiler.source.jdk>
+                  <compiler.target.jdk>${java.version}</compiler.target.jdk>
+                </additionalProperties>
+              </configuration>
+            </execution>
+            <!-- 注入 profile.active 变量 (local) -->
+            <execution>
+              <id>profile-active-property</id>
+              <goals>
+                <goal>profile-active-property</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>generate-assembly-config</id>
+              <goals>
+                <goal>generate-assembly-config</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>delete-temp-file</id>
+              <goals>
+                <goal>delete-temp-file</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>generate-compiled-id</id>
+              <goals>
+                <goal>generate-compiled-id</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- 依赖冲突提示 -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>io.github.dong4j</groupId>
+              <artifactId>coco-enforcer-plugin-rule</artifactId>
+              <version>${coco-plugin.version}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>enforce-versions</id>
+              <configuration>
+                <fail>false</fail>
+                <rules>
+                  <dependencyConvergence/>
+                  <sparkEcforcerRule implementation="io.github.dong4j.coco.plugin.enforcer.rule.CocoEcforcerRule">
+                    <shouldIfail>true</shouldIfail>
+                  </sparkEcforcerRule>
+                </rules>
+              </configuration>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- 用于生成 git.properties -->
+        <plugin>
+          <groupId>pl.project13.maven</groupId>
+          <artifactId>git-commit-id-plugin</artifactId>
+          <version>${git-commit-id-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>get-the-git-infos</id>
+              <goals>
+                <goal>revision</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>validate-the-git-infos</id>
+              <goals>
+                <goal>validateRevision</goal>
+              </goals>
+              <phase>package</phase>
+            </execution>
+          </executions>
+          <configuration>
+            <!-- https://github.com/git-commit-id/maven-git-commit-id-plugin/issues/315 -Dmaven.gitcommitid.skip=true -->
+            <skip>false</skip>
+            <!-- 使 properties 扩展到整个 maven bulid 周期
+            Ref: https://github.com/ktoso/maven-git-commit-id-plugin/issues/280 -->
+            <injectAllReactorProjects>true</injectAllReactorProjects>
+            <dateFormat>yyyy.MM.dd HH:mm:ss</dateFormat>
+            <verbose>true</verbose>
+            <!-- 是否生成 git.properties 属性文件 -->
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+            <!-- 不是 git 项目时, 不失败 -->
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <commitIdGenerationMode>full</commitIdGenerationMode>
+            <!--git 描述配置, 可选; 由 JGit 提供实现;-->
+            <gitDescribe>
+              <skip>false</skip>
+              <!-- 提交操作未发现 tag 时, 仅打印提交操作 ID,-->
+              <always>false</always>
+              <!-- 提交操作 ID 显式字符长度, 最大值为:40; 默认值:7; 0 代表特殊意义; -->
+              <abbrev>7</abbrev>
+              <!-- 构建触发时, 代码有修改时 (即 "dirty state"), 添加指定后缀; 默认值:"";-->
+              <dirty>-dirty</dirty>
+              <forceLongFormat>false</forceLongFormat>
+              <tags>true</tags>
+            </gitDescribe>
+          </configuration>
+        </plugin>
+
+        <!-- http://maven.apache.org/plugins/maven-javadoc-plugin/index.html -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <configuration>
+            <!-- 跳过 javadoc 注释检查 -->
+            <doclint>none</doclint>
+            <encoding>${project.encoding}</encoding>
+            <charset>${project.encoding}</charset>
+            <docencoding>${project.encoding}</docencoding>
+            <failOnError>false</failOnError>
+            <tags>
+              <tag>
+                <name>email</name>
+                <placement>t</placement>
+                <head>开发者邮箱:</head>
+              </tag>
+              <tag>
+                <name>date</name>
+                <placement>t</placement>
+                <head>创建时间:</head>
+              </tag>
+            </tags>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <!-- 绑定 source 插件到 Maven 的生命周期 -->
+              <phase>verify</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- http://maven.apache.org/plugins/maven-checkstyle-plugin/index.html -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${maven-checkstyle-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>checkstyle-validation</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <logViolationsToConsole>true</logViolationsToConsole>
+            <configLocation>coco-checks.xml</configLocation>
+            <suppressionsLocation>suppressions.xml</suppressionsLocation>
+            <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <consoleOutput>true</consoleOutput>
+            <failOnViolation>true</failOnViolation>
+            <cacheFile>${project.build.directory}/checkstyle/checkstyle-cachefile</cacheFile>
+            <outputFile>${project.build.directory}/checkstyle/checkstyle-result.xml</outputFile>
+            <rulesFiles>${project.build.directory}/checkstyle/checkstyle-rules.xml</rulesFiles>
+            <linkXRef>false</linkXRef>
+            <includes>**\/spark\/**\/*.java</includes>
+            <includeResources>false</includeResources>
+            <includeTestResources>false</includeTestResources>
+            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+          </configuration>
+
+          <dependencies>
+            <dependency>
+              <groupId>io.github.dong4j</groupId>
+              <artifactId>coco-checkstyle-plugin-rule</artifactId>
+              <version>${coco-plugin.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <!-- http://maven.apache.org/plugins/maven-pmd-plugin/index.html -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>${maven-pmd-plugin.version}</version>
+          <configuration>
+            <!-- 在父项目中聚合 -->
+            <!--<aggregate>true</aggregate>-->
+            <skipEmptyReport>true</skipEmptyReport>
+            <!--<rulesets>-->
+            <!--  <ruleset>rulesets/coco-comment.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-concurrent.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-constant.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-exception.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-flowcontrol.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-naming.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-oop.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-orm.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-other.xml</ruleset>-->
+            <!--  <ruleset>rulesets/coco-set.xml</ruleset>-->
+            <!--</rulesets>-->
+            <printFailingErrors>true</printFailingErrors>
+            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+            <targetJdk>${java.version}</targetJdk>
+            <linkXRef>false</linkXRef>
+            <verbose>true</verbose>
+            <includes>**\/spark\/**\/*.java</includes>
+          </configuration>
+          <executions>
+            <!-- 绑定 pmd:check 到 verify 生命周期 -->
+            <execution>
+              <id>validate</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+            <!-- 绑定 pmd:pmd 到 site 生命周期 -->
+            <execution>
+              <id>pmd-pmd-site</id>
+              <phase>site</phase>
+              <goals>
+                <goal>pmd</goal>
+              </goals>
+            </execution>
+          </executions>
+
+          <dependencies>
+            <!-- 需要使用阿里的一些 xml 文件, 因此需要这里增加 p3c 的依赖 -->
+            <dependency>
+              <groupId>com.alibaba.p3c</groupId>
+              <artifactId>p3c-pmd</artifactId>
+              <version>${p3c-pmd.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>jacoco-initialize</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>jacoco-site</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

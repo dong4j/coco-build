@@ -13,10 +13,31 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>coco-dependencies-parent</module>
+    <module>coco-company-dependencies-parent</module>
+    <module>coco-distribution-parent</module>
+    <module>coco-doc-distribution-parent</module>
   </modules>
 
   <properties>
     <revision>2023.1.1-SNAPSHOT</revision>
   </properties>
+
+  <developers>
+    <developer>
+      <name>dong4j</name>
+      <email>dong4j@gmail.com</email>
+      <id>dong4j</id>
+      <roles>
+        <role>designer</role>
+      </roles>
+    </developer>
+  </developers>
+  <scm>
+    <!-- mvn scm:checkin -Dmessage=xxx : push 代码; mvn scm:update : 更新代码 -->
+    <url>https://github.com/dong4j/coco-build</url>
+    <!-- scm:[git/svn]: 地址 -->
+    <connection>scm:git:git://github.com/dong4j/coco-build.git</connection>
+    <developerConnection>scm:git:ssh://github.com/dong4j/coco-build.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 </project>

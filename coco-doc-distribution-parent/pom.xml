@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.dong4j</groupId>
+    <artifactId>coco-build</artifactId>
+    <version>${revision}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>coco-doc-distribution-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>Coco Doc Distribution Parent</name>
+  <description>一键部署项目知识库的父依赖</description>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.github.dong4j</groupId>
+          <artifactId>coco-publish-maven-plugin</artifactId>
+          <version>${revision}</version>
+          <executions>
+            <execution>
+              <id>publish-doc</id>
+              <phase>deploy</phase>
+              <goals>
+                <goal>publish-doc</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>io.github.dong4j</groupId>
+        <artifactId>coco-publish-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

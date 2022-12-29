@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.dong4j</groupId>
+    <artifactId>coco-company-build</artifactId>
+    <version>${revision}</version>
+    <relativePath>../coco-company-build/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>coco-starter-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>Coco Starter Parent</name>
+  <description>作为 starter 组件项目的父依赖</description>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <filtering>true</filtering>
+        <excludes>
+          <!-- 排除 jrebel 配置文件 -->
+          <exclude>rebel.xml</exclude>
+          <exclude>.rebel.xml.bak</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <!-- 排除 jrebel 配置文件 -->
+          <exclude>rebel.xml</exclude>
+          <exclude>.rebel.xml.bak</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
