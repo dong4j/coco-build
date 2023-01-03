@@ -167,7 +167,7 @@
                 <Compile-Source-JDK>${java.version}</Compile-Source-JDK>
                 <Compile-Target-JDK>${java.version}</Compile-Target-JDK>
                 <Project-Name>${project.build.finalName}</Project-Name>
-                <Project-Group>info.spark</Project-Group>
+                <Project-Group>io.github.dong4j.coco</Project-Group>
                 <Built-By>${user.name}</Built-By>
               </manifestEntries>
               <manifest>

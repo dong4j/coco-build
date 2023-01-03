@@ -240,9 +240,9 @@
                 <fail>false</fail>
                 <rules>
                   <dependencyConvergence/>
-                  <sparkEcforcerRule implementation="io.github.dong4j.coco.plugin.enforcer.rule.CocoEcforcerRule">
+                  <cocoEcforcerRule implementation="io.github.dong4j.coco.plugin.enforcer.rule.CocoEcforcerRule">
                     <shouldIfail>true</shouldIfail>
-                  </sparkEcforcerRule>
+                  </cocoEcforcerRule>
                 </rules>
               </configuration>
               <goals>
@@ -356,14 +356,13 @@
             <configLocation>coco-checks.xml</configLocation>
             <suppressionsLocation>suppressions.xml</suppressionsLocation>
             <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
-            <encoding>${project.build.sourceEncoding}</encoding>
             <consoleOutput>true</consoleOutput>
             <failOnViolation>true</failOnViolation>
             <cacheFile>${project.build.directory}/checkstyle/checkstyle-cachefile</cacheFile>
             <outputFile>${project.build.directory}/checkstyle/checkstyle-result.xml</outputFile>
             <rulesFiles>${project.build.directory}/checkstyle/checkstyle-rules.xml</rulesFiles>
             <linkXRef>false</linkXRef>
-            <includes>**\/spark\/**\/*.java</includes>
+            <includes>**\/coco\/**\/*.java</includes>
             <includeResources>false</includeResources>
             <includeTestResources>false</includeTestResources>
             <includeTestSourceDirectory>false</includeTestSourceDirectory>
@@ -400,11 +399,10 @@
             <!--  <ruleset>rulesets/coco-set.xml</ruleset>-->
             <!--</rulesets>-->
             <printFailingErrors>true</printFailingErrors>
-            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
             <targetJdk>${java.version}</targetJdk>
             <linkXRef>false</linkXRef>
             <verbose>true</verbose>
-            <includes>**\/spark\/**\/*.java</includes>
+            <includes>**\/coco\/**\/*.java</includes>
           </configuration>
           <executions>
             <!-- 绑定 pmd:check 到 verify 生命周期 -->
